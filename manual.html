@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google AI Studio 文字起こしマニュアル</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4285f4;
+            --primary-dark: #3367d6;
+            --success: #34a853;
+            --warning: #fbbc04;
+            --danger: #ea4335;
+            --bg-light: #f8f9fa;
+            --bg-card: #ffffff;
+            --text-primary: #202124;
+            --text-secondary: #5f6368;
+            --border: #dadce0;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+            --shadow-hover: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--text-primary);
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--primary);
+            display: inline-block;
+        }
+
+        .step-card {
+            border-left: 4px solid var(--primary);
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-right: 1rem;
+        }
+
+        .step-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .step-title h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .prep-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .prep-column {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .prep-column.required {
+            border: 2px solid var(--primary);
+        }
+
+        .prep-column.optional {
+            border: 2px solid #ff9800;
+        }
+
+        .prep-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            gap: 0.5rem;
+        }
+
+        .required-header {
+            background: linear-gradient(135deg, #4285f4 0%, #3367d6 100%);
+            color: white;
+        }
+
+        .optional-header {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            color: white;
+        }
+
+        .prep-icon {
+            font-size: 1.5rem;
+        }
+
+        .prep-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .prep-list {
+            padding: 1.5rem;
+            margin: 0;
+            list-style: none;
+            background: white;
+        }
+
+        .prep-list li {
+            padding: 0.5rem 0;
+            padding-left: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .prep-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .emoji {
+            font-size: 1.3rem;
+            margin-right: 0.5rem;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-left: 4px solid var(--success);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+
+        .tip-box h4 {
+            color: var(--success);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .important-box {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border-left: 4px solid var(--warning);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+
+        .important-box h4 {
+            color: #e65100;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .screenshot {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            box-shadow: var(--shadow);
+        }
+
+        .prompt-box {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .faq-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .faq-item h4 {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .faq-item p {
+            color: var(--text-secondary);
+        }
+
+        ul {
+            margin: 0.5rem 0 0.5rem 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎙️ Google AI Studio 文字起こしマニュアル</h1>
+            <p>会議の録音から、誰が何を話したかわかる議事録を自動で作成する方法</p>
+        </header>
+
+        <section class="card">
+            <h2>📋 準備するもの</h2>
+            <div class="prep-grid">
+                <div class="prep-column required">
+                    <div class="prep-header required-header">
+                        <span class="prep-icon">✅</span>
+                        <span class="prep-label">必須</span>
+                    </div>
+                    <ul class="prep-list">
+                        <li>Googleアカウント</li>
+                        <li>会議の録音データ<br><small>（mp3, m4a, wav など）</small></li>
+                    </ul>
+                </div>
+                <div class="prep-column optional">
+                    <div class="prep-header optional-header">
+                        <span class="prep-icon">⭐</span>
+                        <span class="prep-label">あると精度アップ</span>
+                    </div>
+                    <ul class="prep-list">
+                        <li>📋 参加者名簿（テキストでOK）</li>
+                        <li>📄 会議資料（PDF, Word など）</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tip-box">
+                <h4>💡 精度アップのコツ</h4>
+                <p>参加者名簿や会議資料を一緒にアップロードすると、AIが名前や専門用語を正しく認識してくれます！</p>
+            </div>
+        </section>
+
+        <section class="card step-card">
+            <div class="step-title">
+                <span class="step-number">1</span>
+                <h3>Google AI Studio を開く</h3>
+            </div>
+            <p>ブラウザで以下のURLにアクセスします：</p>
+            <p style="margin: 1rem 0;"><a href="https://aistudio.google.com/" target="_blank"
+                    style="color: var(--primary); font-weight: 600; font-size: 1.1rem;">https://aistudio.google.com/</a>
+            </p>
+            <p>初めての方は、お持ちのGoogleアカウントでログインしてください。</p>
+        </section>
+
+        <section class="card step-card">
+            <div class="step-title">
+                <span class="step-number">2</span>
+                <h3>新しいチャットを始める</h3>
+            </div>
+            <p>トップページが表示されたら、<strong>「Chat with models」</strong> をクリックします。</p>
+            <img src="./images/step2_new_chat.png" alt="チャット画面の例" class="screenshot">
+        </section>
+
+        <section class="card step-card">
+            <div class="step-title">
+                <span class="step-number">3</span>
+                <h3>最新のAIモデルを選ぶ</h3>
+            </div>
+            <p>右側のパネルにあるモデル選択ボタンをクリックし、<strong>「Gemini 3 Pro Preview」</strong> を選びます。<br>これが現時点で最も高性能なモデルです。</p>
+            <img src="./images/step3_model_options.png" alt="モデル選択画面" class="screenshot">
+        </section>
+
+        <section class="card step-card">
+            <div class="step-title">
+                <span class="step-number">4</span>
+                <h3>録音データと資料をアップロードする</h3>
+            </div>
+            <ol>
+                <li>画面下部の「<strong>＋</strong>」ボタン（または「Insert...」ボタン）をクリックします</li>
+                <li>メニューから <strong>「Upload a file」</strong> を選択して、録音ファイル（mp3, m4a, wavなど）をアップロードします</li>
+                <li><strong>（重要）</strong> 同じ手順で参加者名簿や会議資料（PDF, Wordなど）もアップロードしましょう</li>
+            </ol>
+            <img src="./images/step4_insert_menu.png" alt="ファイル追加メニュー" class="screenshot">
+            <div class="important-box">
+                <h4>⚠️ 名簿・資料を添付すると精度が上がる理由</h4>
+                <ul>
+                    <li>AIが参加者の名前を正確に認識できる</li>
+                    <li>専門用語や固有名詞を正しく聞き取れる</li>
+                    <li>話の文脈を理解して間違いが減る</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="card step-card">
+            <div class="step-title">
+                <span class="step-number">5</span>
+                <h3>AIへの指示文を入力する</h3>
+            </div>
+            <p>以下の指示文をコピー＆ペーストして、テキスト入力欄に貼り付けてください。</p>
+            <div class="prompt-box" id="prompt-text">
+                <button class="copy-btn" onclick="copyPrompt()">📋 コピー</button>
+                この音声ファイルは会議の録音です。以下の作業をお願いします。
+
+                【やってほしいこと】
+                1. 音声の内容を文字に起こしてください
+                2. 話している人ごとに発言を分けてください
+                3. できるだけ正確に、話された言葉をそのまま書き起こしてください
+                4. 「えー」「あのー」「まあ」「その」などの言いよどみ（フィラー）は取り除いてください
+
+                【出力形式】
+                話者A: 〇〇〇〇〇
+                話者B: △△△△△
+                ※話者名が添付の名簿から判別できる場合は、実名で記載してください
+
+                【添付資料について】
+                - 名簿や会議資料を添付している場合は、それを参考にして人名や専門用語を正確に記載してください
+            </div>
+        </section>
+
+        <section class="card step-card">
+            <div class="step-title">
+                <span class="step-number">6</span>
+                <h3>実行して結果を確認する</h3>
+            </div>
+            <ol>
+                <li>指示文を入力したら、<strong>「Run」</strong> ボタン（または送信ボタン）をクリック</li>
+                <li>AIが処理を開始します（音声の長さによって数分かかることがあります）</li>
+                <li>結果が表示されたら、コピーして議事録作成に活用してください</li>
+            </ol>
+        </section>
+
+        <section class="card">
+            <h2>❓ よくある質問</h2>
+
+            <div class="faq-item">
+                <h4>Q: 音声ファイルのサイズ制限はありますか？</h4>
+                <p>A: Google AI Studio では、かなり長い音声でも処理できます。1時間以上の会議でも対応可能です。</p>
+            </div>
+
+            <div class="faq-item">
+                <h4>Q: 話者を正しく分けてくれない場合は？</h4>
+                <p>A: 以下を試してみてください：</p>
+                <ul>
+                    <li>参加者名簿を必ず添付する</li>
+                    <li>指示文に「参加者は○○さん、△△さん、□□さんの3名です」と明記する</li>
+                </ul>
+            </div>
+
+            <div class="faq-item">
+                <h4>Q: 専門用語が間違って変換される場合は？</h4>
+                <p>A: 会議資料やアジェンダを添付すると改善します。また、指示文に「○○という専門用語が使われます」と補足するのも効果的です。</p>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>🆘 困ったときは</h2>
+            <ul>
+                <li><strong>ログインできない</strong> → 会社のGoogleアカウント（G Suite）でログインしてみてください</li>
+                <li><strong>ファイルがアップロードできない</strong> → ファイル形式を確認してください（mp3, m4a, wav に対応）</li>
+                <li><strong>結果が正しくない</strong> → 指示文を具体的にするか、参考資料を追加してください</li>
+            </ul>
+        </section>
+
+        <footer class="footer">
+            <p>作成日: 2025年12月18日</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyPrompt() {
+            const promptText = document.getElementById('prompt-text').innerText.replace('📋 コピー', '').trim();
+            navigator.clipboard.writeText(promptText).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = '✅ コピーしました！';
+                setTimeout(() => {
+                    btn.textContent = '📋 コピー';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>
